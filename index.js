@@ -48,6 +48,12 @@ http.createServer(function (req, res) {
     ) {
         let ua = uap(req.headers['user-agent']);
         console.log(ua);
+        userDeviceInfo.platform = ua.os?.name ? ua.os.name : "Unknown";
+        userDeviceInfo.browser = ua.browser?.name ? ua.browser.name : "Unknown";
+        userDeviceInfo.browser_major_version = ua.browser?.major ? ua.browser.major : "Unknown";
+        userDeviceInfo.engine = ua.engine?.name ? ua.engine.name : "Unknown";
+        userDeviceInfo.engine_major_version = ua.engine?.version ? ua.engine.version : "Unknown";
+        userDeviceInfo.is_mobile = ua.device?.type === "mobile" ? true : false;
 
         res.end(JSON.stringify({
             result: userDeviceInfo,
