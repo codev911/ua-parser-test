@@ -2,25 +2,71 @@ const http = require('http');
 const uap = require('ua-parser-js');
 
 http.createServer(function (req, res) {
-    // get user-agent header
-    let ua = uap(req.headers['user-agent']);
+    const userDeviceInfo = {
+		platform: 'Unknown',
+		browser: 'Unknown',
+		browser_major_version: 'Unknown',
+		engine: 'Unknown',
+		engine_major_version: 'Unknown',
+		is_mobile: false,
+	};
 
-    /* 
-    // Since v2.0.0
-    // you can also pass Client Hints data to UAParser
-    // note: only works in a secure context (localhost or https://)
-    // from any browsers that are based on Chrome 85+
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA
+    if (
+        (req.headers['user-agent'] && typeof req.headers['user-agent'] === 'string') &&
+        (req.headers['sec-ch-ua'] && typeof req.headers['sec-ch-ua'] === 'string') &&
+        (req.headers['sec-ch-ua-mobile'] && typeof req.headers['sec-ch-ua-mobile'] === 'string') && 
+        (req.headers['sec-ch-ua-platform'] && typeof req.headers['sec-ch-ua-platform'] === 'string')
+    ) {
+        let ua = uap(req.headers['user-agent']);
 
-        const getHighEntropyValues = 'Sec-CH-UA-Full-Version-List, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version, Sec-CH-UA-Arch, Sec-CH-UA-Bitness';
-        res.setHeader('Accept-CH', getHighEntropyValues);
-        res.setHeader('Critical-CH', getHighEntropyValues);
-        
-        ua = uap(req.headers).withClientHints();
-    */
+        userDeviceInfo.platform = req.headers['sec-ch-ua-platform'].replace(/"/g, '');
+        userDeviceInfo.is_mobile = req.headers['sec-ch-ua-mobile'] === '?1' ? true : false;
+        const parseData = req.headers['sec-ch-ua'].split(', ');
+		const parseDataBrowser = parseData[0] ? parseData[0].split(';v=') : ['Unknown', 'Unknown'];
+		const parseDataEngine = parseData[1] ? parseData[1].split(';v=') : ['Unknown', 'Unknown'];
 
-    // write the result as response
-    res.end(JSON.stringify(ua, null, '  '));
+		userDeviceInfo.browser = parseDataBrowser[0] ? parseDataBrowser[0].replace(/"/g, '') : 'Unknown';
+		userDeviceInfo.browser_major_version = parseDataBrowser[1] ? parseDataBrowser[1].replace(/"/g, '') : 'Unknown';
+		userDeviceInfo.engine = parseDataEngine[0] ? parseDataEngine[0].replace(/"/g, '') : 'Unknown';
+		userDeviceInfo.engine_major_version = parseDataEngine[1] ? parseDataEngine[1].replace(/"/g, '') : 'Unknown';
+
+        res.end(JSON.stringify({
+            result: userDeviceInfo,
+            debug: {
+                "user-agent": req.headers['user-agent'],
+                "sec-ch-ua-mobile": req.headers['sec-ch-ua-mobile'],
+                "sec-ch-ua-platform": req.headers['sec-ch-ua-platform'],
+                "sec-ch-ua": req.headers['sec-ch-ua'],
+            }
+        }, null, '  '));
+    } else if (
+        (req.headers['user-agent'] && typeof req.headers['user-agent'] === 'string') &&
+        !req.headers['sec-ch-ua'] &&
+        !req.headers['sec-ch-ua-mobile'] &&
+        !req.headers['sec-ch-ua-platform']
+    ) {
+        let ua = uap(req.headers['user-agent']);
+
+        res.end(JSON.stringify({
+            result: userDeviceInfo,
+            debug: {
+                "user-agent": req.headers['user-agent'],
+                "sec-ch-ua-mobile": req.headers['sec-ch-ua-mobile'],
+                "sec-ch-ua-platform": req.headers['sec-ch-ua-platform'],
+                "sec-ch-ua": req.headers['sec-ch-ua'],
+            }
+        }, null, '  '));
+    } else {
+        res.end(JSON.stringify({
+            result: userDeviceInfo,
+            debug: {
+                "user-agent": req.headers['user-agent'],
+                "sec-ch-ua-mobile": req.headers['sec-ch-ua-mobile'],
+                "sec-ch-ua-platform": req.headers['sec-ch-ua-platform'],
+                "sec-ch-ua": req.headers['sec-ch-ua'],
+            }
+        }, null, '  '));
+    }
 })
 .listen(1337);
 
