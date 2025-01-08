@@ -31,6 +31,7 @@ http.createServer(function (req, res) {
         res.end(JSON.stringify({
             result: userDeviceInfo,
             debug: {
+                use_ua: {},
                 "user-agent": req.headers['user-agent'],
                 "sec-ch-ua-mobile": req.headers['sec-ch-ua-mobile'],
                 "sec-ch-ua-platform": req.headers['sec-ch-ua-platform'],
@@ -54,6 +55,7 @@ http.createServer(function (req, res) {
         res.end(JSON.stringify({
             result: userDeviceInfo,
             debug: {
+                use_ua: ua,
                 "user-agent": req.headers['user-agent'],
                 "sec-ch-ua-mobile": req.headers['sec-ch-ua-mobile'],
                 "sec-ch-ua-platform": req.headers['sec-ch-ua-platform'],
@@ -64,6 +66,7 @@ http.createServer(function (req, res) {
         res.end(JSON.stringify({
             result: userDeviceInfo,
             debug: {
+                use_ua: {},
                 "user-agent": req.headers['user-agent'],
                 "sec-ch-ua-mobile": req.headers['sec-ch-ua-mobile'],
                 "sec-ch-ua-platform": req.headers['sec-ch-ua-platform'],
