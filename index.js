@@ -18,6 +18,7 @@ http.createServer(function (req, res) {
         (req.headers['sec-ch-ua-platform'] && typeof req.headers['sec-ch-ua-platform'] === 'string')
     ) {
         let ua = uap(req.headers['user-agent']);
+        console.log(ua);
 
         userDeviceInfo.platform = req.headers['sec-ch-ua-platform'].replace(/"/g, '');
         userDeviceInfo.is_mobile = req.headers['sec-ch-ua-mobile'] === '?1' ? true : false;
@@ -46,6 +47,7 @@ http.createServer(function (req, res) {
         !req.headers['sec-ch-ua-platform']
     ) {
         let ua = uap(req.headers['user-agent']);
+        console.log(ua);
 
         res.end(JSON.stringify({
             result: userDeviceInfo,
